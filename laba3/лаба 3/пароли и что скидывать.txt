@@ -1,0 +1,6 @@
+home user - sys
+sys, system, pdbadmin - 12345Sys
+db name - db13
+DB13 sid - DB13
+
+что скидывать? - 9-1, laba3

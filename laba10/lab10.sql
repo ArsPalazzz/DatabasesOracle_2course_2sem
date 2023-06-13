@@ -1,0 +1,207 @@
+set serveroutput on --чтобы вывод DBMS_OUPUT отображался 
+
+--1. simple anonymous block without operators
+begin     --start of block
+          --start of EXECUTION section
+  null;
+          --end of EXECUTION section
+end;      --end of block
+
+--2. anonymous block print "Hello world"
+begin
+  dbms_output.put_line('Hello world');
+end;
+
+
+--3 
+DECLARE
+  special_chars VARCHAR2(100) := '!@#$%^&*()-_+=[]{}\|;:,.<>/?~';
+BEGIN
+  FOR i IN 1..LENGTH(special_chars) LOOP
+    dbms_output.put_line(SUBSTR(special_chars,i,1));
+  END LOOP;
+END;
+
+--4  keyword (reserved words)
+select keyword from v_$reserved_words
+    where length > 2 and keyword!= 'A' order by keyword;
+
+--5. anonymous block
+declare
+  
+  a number(3) := 5;
+  b number(3) := 2;
+  --number(n,s)   n=[0,38], s=[-84,127]
+  c1 number(4, 2);
+  c2 number(4, -1);
+  d binary_float := 11110.10;
+  e binary_double := 11110.10;
+  f number := 3e4;
+  isTrue boolean := true;
+  
+  my_date DATE := TO_DATE('2023-4-7', 'YYYY-MM-DD');
+  my_char CHAR(10) := 'Hello';
+  --для большой длины
+  my_clob CLOB := 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac nisi nec magna malesuada pretium.';
+  --для поддержки unicode
+  my_nchar NCHAR(10) := N'? ? ? ?';
+  --для хранения бинарных данных
+  my_raw RAW(16) := HEXTORAW('CAFEBABE');
+  
+  
+  begin
+    --inizialization int numbers
+    dbms_output.put_line('a = ' ||a);
+    dbms_output.put_line('b = ' ||b);
+    
+    --operations with two int numbers and %
+    dbms_output.put_line('a + b = ' ||(a + b));
+    dbms_output.put_line('a - b = ' ||(a - b));
+    dbms_output.put_line('a * b = ' ||(a * b));
+    dbms_output.put_line('a / b = ' ||(a / b));
+    dbms_output.put_line('a % b = ' ||(a mod b));
+           
+        
+    c1 := 11.51;
+    dbms_output.put_line('c1 = '||c1);
+    c2 := 11.51;
+    dbms_output.put_line('c2 = '||c2);
+    
+     --e4 (*10^4)
+    dbms_output.put_line('f (*10^4) = ' ||f);
+    
+    dbms_output.put_line('Date = '||my_date);
+    
+    dbms_output.put_line('my_char= '||my_char);
+    dbms_output.put_line('my_clob= '||my_clob);
+    dbms_output.put_line('my_nchar= '||my_nchar);
+    dbms_output.put_line('my_raw= '||my_raw);
+
+    --Boolean
+    if isTrue
+        then dbms_output.put_line('isTrue = true');
+        else dbms_output.put_line('isTrue = false');
+    end if;
+    exception
+      when others
+      then
+        dbms_output.put_line('error: ' || sqlerrm);
+        dbms_output.put_line('code: ' || sqlcode);
+end;
+
+--6
+declare
+  stringConst constant varchar2(10) := 'Hello';
+  charConst constant char(10) := 'world';
+  numConst constant number(5) := 5;
+  begin
+  dbms_output.put_line('stringConst = ' || stringConst);
+  dbms_output.put_line('Length(stringConst) = ' || length(stringConst));
+  
+  dbms_output.put_line('charConst = ' || charConst);
+  dbms_output.put_line('Length(charConst) = ' || length(charConst));
+  
+  dbms_output.put_line('numConst = ' || numConst);
+  dbms_output.put_line('Length(numConst) = ' || length(numConst));
+  dbms_output.put_line('numConst * 100 = ' || numConst * 100);
+end;
+
+--7-8
+--%TYPE for def-n var (base other var or field in table)
+--%ROWTYPE for def-n strucrure (base table or cursor)
+declare 
+  subject sys.subject.subject%type;
+  pulpit sys.pulpit.pulpit%type;
+  faculty_rec sys.faculty%rowtype;
+  begin
+  subject := 'INF';
+  pulpit := 'ISiT';
+  faculty_rec.faculty := 'IT';
+    faculty_rec.faculty_name := 'Fakul`tet informacionnyh tekhnologij';
+    dbms_output.put_line(subject);
+    dbms_output.put_line(pulpit);
+    dbms_output.put_line(rtrim(faculty_rec.faculty) || ': ' || faculty_rec.faculty_name);
+    exception
+        when others
+        then dbms_output.put_line('error = ' || sqlerrm);
+end;
+
+--9
+--if elsif else
+declare
+    x int := 17;
+begin
+    if 50 > x
+        then dbms_output.put_line('50 > ' || x);
+    end if;
+    if 50 = x
+      then dbms_output.put_line('50 = '||x);
+    end if;
+    if 100 > x
+        then dbms_output.put_line('100 > ' || x);
+    end if;
+    if 100 = x
+      then dbms_output.put_line('50 = '||x);
+    end if;
+end;
+--------------------------------------------------------
+declare
+    x int := 17;
+begin
+    if 50 > x
+        then dbms_output.put_line('50 > ' || x);
+    elsif 50 = x
+        then dbms_output.put_line('50 = '||x);
+    elsif 100 > x
+        then dbms_output.put_line('100 > ' || x);
+    elsif 100 = x
+        then dbms_output.put_line('100 = ' || x);
+    else dbms_output.put_line('100 <> ' || x);
+    end if;
+end;
+
+--10. CASE
+declare 
+  x pls_integer := 17;
+begin
+  case x
+    when 1 then dbms_output.put_line('1');
+    when 2 then dbms_output.put_line('2');
+    when 3 then dbms_output.put_line('3');
+   else dbms_output.put_line('else');
+  end case;
+  
+  case 
+    when 8 > x then dbms_output.put_line('8 > '||x);
+    when 8 = x then dbms_output.put_line('8 = '||x);
+    when 12 = x then dbms_output.put_line('12 = '||x);
+    when x between 13 and 20 then dbms_output.put_line('13 <= '||x||' <=20');
+    else dbms_output.put_line('else');
+    end  case;
+end;
+  
+--11
+declare 
+  x pls_integer := 0;
+begin
+  loop
+  x:= x + 1;
+  dbms_output.put_line(x);
+  exit when x > 5;
+  end loop;
+  dbms_output.put_line('-------------------------------');
+  for k in 1..5
+  loop
+    dbms_output.put_line(k);
+  end loop;
+  dbms_output.put_line('-------------------------------');
+  while(x > 0)
+  loop
+    x := x - 1;
+    dbms_output.put_line(x);
+  end loop;
+end;
+  
+  
+  
+
